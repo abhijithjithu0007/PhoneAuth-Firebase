@@ -1,4 +1,3 @@
-// RegisterUser.tsx
 import { useDispatch, useSelector } from "react-redux";
 import { db } from "../firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
