@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-//slice for controlling the phone auth state
 interface AuthState {
   phone: string;
   otp: string;
   confirmationResult: any;
   loading: boolean;
+  isAuthenticated: boolean;
 }
 
 const initialState: AuthState = {
@@ -13,6 +13,7 @@ const initialState: AuthState = {
   otp: "",
   confirmationResult: null,
   loading: false,
+  isAuthenticated: false,
 };
 
 const authSlice = createSlice({
@@ -31,11 +32,15 @@ const authSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
+    setAuthenticated: (state, action: PayloadAction<boolean>) => {
+      state.isAuthenticated = action.payload;
+    },
     resetAuthState: (state) => {
       state.phone = "";
       state.otp = "";
       state.confirmationResult = null;
       state.loading = false;
+      state.isAuthenticated = false;
     },
   },
 });
@@ -45,6 +50,7 @@ export const {
   setOtp,
   setConfirmationResult,
   setLoading,
+  setAuthenticated,
   resetAuthState,
 } = authSlice.actions;
 

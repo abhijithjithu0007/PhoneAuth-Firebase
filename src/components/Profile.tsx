@@ -4,6 +4,7 @@ import { auth } from "../firebaseConfig";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { setAuthenticated } from "../feature/authSlice";
 
 type PhoneNumber = string | null;
 
@@ -33,6 +34,7 @@ const Profile: React.FC = () => {
       navigate("/");
       toast.success("Logged out successfully.");
       localStorage.removeItem("isLogin");
+      dispatch(setAuthenticated(true));
     } catch (error: any) {
       console.log(error);
     }

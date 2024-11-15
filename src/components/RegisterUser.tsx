@@ -1,13 +1,14 @@
+// RegisterUser.tsx
 import { useDispatch, useSelector } from "react-redux";
 import { db } from "../firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { clearUserDetails } from "../feature/registerSlice";
+import { setAuthenticated } from "../feature/authSlice";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
-// registration form page
 interface FormValues {
   firstName: string;
   lastName: string;
@@ -17,10 +18,6 @@ interface FormValues {
 
 const RegisterUser: React.FC = () => {
   const dispatch = useDispatch();
-  const { firstName, lastName, email, error, successMessage } = useSelector(
-    (state: any) => state.user
-  );
-
   const navigate = useNavigate();
   const phone = localStorage.getItem("phoneNumber") || "";
 
@@ -55,6 +52,7 @@ const RegisterUser: React.FC = () => {
       });
 
       dispatch(clearUserDetails());
+      dispatch(setAuthenticated(true));
       toast.success("User registered successfully!");
       localStorage.setItem("isLogin", JSON.stringify(true));
       navigate("/profile");
@@ -79,17 +77,14 @@ const RegisterUser: React.FC = () => {
         <div className="w-full sm:w-1/2 p-6 mt-20">
           <h2 className="text-4xl font-bold text-gray-800 mb-4">Sign Up</h2>
           <p className="text-gray-600 mb-6">
-            Lets get you all set up so you can access your personal account
+            Let's get you all set up so you can access your personal account
           </p>
-
-          {error && <p className="text-red-500">{error}</p>}
-          {successMessage && <p className="text-green-500">{successMessage}</p>}
 
           <Formik
             initialValues={{
-              firstName: firstName || "",
-              lastName: lastName || "",
-              email: email || "",
+              firstName: "",
+              lastName: "",
+              email: "",
               agreeTerms: false,
             }}
             validationSchema={validationSchema}
@@ -170,11 +165,8 @@ const RegisterUser: React.FC = () => {
                     className="mr-2"
                   />
                   <label htmlFor="agreeTerms" className="text-sm text-gray-600">
-                    I agree to the{" "}
-                    <a>
-                      all the <span className="text-red-500">Terms</span> and{" "}
-                      <span className="text-red-500">Privacy Policies</span>
-                    </a>
+                    I agree to all <span className="text-red-500">Terms</span>{" "}
+                    and <span className="text-red-500">Privacy Policies</span>
                   </label>
 
                   <div className="text-red-500 text-sm mt-2">
@@ -184,7 +176,7 @@ const RegisterUser: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-2 bg-blue-600 text-white  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full py-2 bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {isSubmitting ? "Creating.." : "Create account"}
                 </button>
