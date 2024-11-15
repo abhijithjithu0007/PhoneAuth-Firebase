@@ -143,7 +143,7 @@ const Auth = () => {
           <img
             src="/assets/loginImg.png"
             alt="Login illustration"
-            className="w-full h-full object-cover"
+            className="w-full h-full p-10"
           />
         </div>
       </div>
