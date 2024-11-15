@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setOtp } from "../feature/authSlice";
+import { setAuthenticated, setOtp } from "../feature/authSlice";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebaseConfig";
 import { Link } from "react-router-dom";
@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { doc, query, where, collection, getDocs } from "firebase/firestore";
 import { ConfirmationResult, getAuth, onAuthStateChanged } from "firebase/auth";
 import { Formik, Field, Form, ErrorMessage } from "formik";
+import { UseDispatch } from "react-redux";
 import * as Yup from "yup";
 
 interface RootState {
@@ -25,6 +26,7 @@ const VerifyOtp = () => {
   const navigate = useNavigate();
   const auth = getAuth();
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const validationSchema = Yup.object({
     otp: Yup.string()
@@ -60,6 +62,7 @@ const VerifyOtp = () => {
           toast.error("Please log in first.");
         }
       });
+      dispatch(setAuthenticated(true));
     } catch (error) {
       console.error("Error verifying OTP: ", error);
       toast.error("Invalid OTP. Please try again.");
