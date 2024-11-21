@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setAuthenticated, setOtp } from "../feature/authSlice";
+import { setAuthenticated } from "../feature/authSlice";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebaseConfig";
 import { Link } from "react-router-dom";
@@ -8,8 +8,7 @@ import toast from "react-hot-toast";
 import { doc, query, where, collection, getDocs } from "firebase/firestore";
 import { ConfirmationResult, getAuth, onAuthStateChanged } from "firebase/auth";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import { UseDispatch } from "react-redux";
-import * as Yup from "yup";
+import { otpValidationSchema } from "../utils/otpSchema";
 
 interface RootState {
   auth: {
@@ -27,13 +26,7 @@ const VerifyOtp = () => {
   const auth = getAuth();
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-
-  const validationSchema = Yup.object({
-    otp: Yup.string()
-      .length(6, "OTP must be exactly 6 digits")
-      .matches(/^\d+$/, "OTP must contain only digits")
-      .required("OTP is required"),
-  });
+  console.log(confirmationResult);
 
   const verifyOtp = async (values: { otp: string }) => {
     try {
@@ -49,7 +42,11 @@ const VerifyOtp = () => {
         if (user) {
           const usersRef = collection(db, "users");
           const q = query(usersRef, where("phone", "==", phone));
+          console.log(usersRef);
+
           const querySnapshot = await getDocs(q);
+
+          console.log(querySnapshot);
 
           if (!querySnapshot.empty) {
             navigate("/profile");
@@ -64,7 +61,6 @@ const VerifyOtp = () => {
       });
       dispatch(setAuthenticated(true));
     } catch (error) {
-      console.error("Error verifying OTP: ", error);
       toast.error("Invalid OTP. Please try again.");
     } finally {
       setLoading(false);
@@ -75,7 +71,6 @@ const VerifyOtp = () => {
     <div className="relative flex items-center justify-center h-screen">
       <div className="max-w-5xl w-full bg-white flex flex-col sm:flex-row justify-between items-center p-4">
         <div className="w-full sm:w-1/2 p-4">
-          <img src="/assets/logo.png" alt="" />
           <div className="mt-20">
             <Link to={"/"}>
               <img
@@ -92,7 +87,7 @@ const VerifyOtp = () => {
 
           <Formik
             initialValues={{ otp: otp }}
-            validationSchema={validationSchema}
+            validationSchema={otpValidationSchema(otp)}
             onSubmit={(values) => verifyOtp(values)}
           >
             <Form>

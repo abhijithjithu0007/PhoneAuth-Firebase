@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RecaptchaVerifier } from "firebase/auth";
 
 interface AuthState {
   phone: string;
@@ -6,6 +7,7 @@ interface AuthState {
   confirmationResult: any;
   loading: boolean;
   isAuthenticated: boolean;
+  recaptchaVerifier: RecaptchaVerifier | null;
 }
 
 const initialState: AuthState = {
@@ -14,6 +16,7 @@ const initialState: AuthState = {
   confirmationResult: null,
   loading: false,
   isAuthenticated: false,
+  recaptchaVerifier: null,
 };
 
 const authSlice = createSlice({
@@ -35,12 +38,19 @@ const authSlice = createSlice({
     setAuthenticated: (state, action: PayloadAction<boolean>) => {
       state.isAuthenticated = action.payload;
     },
+    setRecaptchaVerifier: (
+      state,
+      action: PayloadAction<RecaptchaVerifier | null>
+    ) => {
+      state.recaptchaVerifier = action.payload;
+    },
     resetAuthState: (state) => {
       state.phone = "";
       state.otp = "";
       state.confirmationResult = null;
       state.loading = false;
       state.isAuthenticated = false;
+      state.recaptchaVerifier = null;
     },
   },
 });
@@ -51,6 +61,7 @@ export const {
   setConfirmationResult,
   setLoading,
   setAuthenticated,
+  setRecaptchaVerifier,
   resetAuthState,
 } = authSlice.actions;
 

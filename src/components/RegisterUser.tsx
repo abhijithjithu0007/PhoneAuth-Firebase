@@ -1,4 +1,4 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { db } from "../firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import { clearUserDetails } from "../feature/registerSlice";
 import { setAuthenticated } from "../feature/authSlice";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { RootState } from "../store";
 
 interface FormValues {
   firstName: string;
@@ -18,8 +19,8 @@ interface FormValues {
 const RegisterUser: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const phone = localStorage.getItem("phoneNumber") || "";
 
+  const { phone } = useSelector((state: RootState) => state.auth);
   const validationSchema = Yup.object({
     firstName: Yup.string().required("First Name is required"),
     lastName: Yup.string().required("Last Name is required"),
