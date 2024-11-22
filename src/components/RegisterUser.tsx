@@ -1,12 +1,14 @@
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { db } from "../firebaseConfig";
-import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { Formik, Form, ErrorMessage, Field } from "formik";
 import toast from "react-hot-toast";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import FormField from "./Formfield";
 import { clearUserDetails } from "../feature/registerSlice";
 import { setAuthenticated } from "../feature/authSlice";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import { regValidationSchema } from "../utils/regSchema";
 import { RootState } from "../store";
 
 interface FormValues {
@@ -19,42 +21,26 @@ interface FormValues {
 const RegisterUser: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { phone } = useSelector((state: RootState) => state.auth);
-  const validationSchema = Yup.object({
-    firstName: Yup.string().required("First Name is required"),
-    lastName: Yup.string().required("Last Name is required"),
-    email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-    agreeTerms: Yup.bool().oneOf(
-      [true],
-      "You must agree to the terms and conditions."
-    ),
-  });
+
+  const initialValues: FormValues = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    agreeTerms: false,
+  };
 
   const handleSubmit = async (values: FormValues, { setSubmitting }: any) => {
-    const { firstName, lastName, email, agreeTerms } = values;
-
-    if (!firstName || !lastName || !email || !agreeTerms) {
-      setSubmitting(false);
-      return;
-    }
-
     try {
       const userId = Date.now().toString();
-
       await setDoc(doc(db, "users", userId), {
-        firstName,
-        lastName,
-        email,
+        ...values,
         phone,
       });
 
       dispatch(clearUserDetails());
       dispatch(setAuthenticated(true));
       toast.success("User registered successfully!");
-      localStorage.setItem("isLogin", JSON.stringify(true));
       navigate("/profile");
     } catch (error: any) {
       console.error(error);
@@ -69,7 +55,7 @@ const RegisterUser: React.FC = () => {
         <div className="w-1/2 hidden sm:block">
           <img
             src="/assets/signup.png"
-            alt=""
+            alt="Sign Up"
             className="w-4/5 rounded-l-lg p-10 h-screen"
           />
         </div>
@@ -81,83 +67,32 @@ const RegisterUser: React.FC = () => {
           </p>
 
           <Formik
-            initialValues={{
-              firstName: "",
-              lastName: "",
-              email: "",
-              agreeTerms: false,
-            }}
-            validationSchema={validationSchema}
+            initialValues={initialValues}
+            validationSchema={regValidationSchema()}
             onSubmit={handleSubmit}
           >
             {({ isSubmitting }) => (
               <Form className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="firstName"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      First Name
-                    </label>
-                    <Field
-                      id="firstName"
-                      name="firstName"
-                      type="text"
-                      placeholder="Enter your first name"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <ErrorMessage
-                      name="firstName"
-                      component="div"
-                      className="text-red-500 text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="lastName"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Last Name
-                    </label>
-                    <Field
-                      id="lastName"
-                      name="lastName"
-                      type="text"
-                      placeholder="Enter your last name"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <ErrorMessage
-                      name="lastName"
-                      component="div"
-                      className="text-red-500 text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Email
-                  </label>
-                  <Field
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  <FormField
+                    label="First Name"
+                    name="firstName"
+                    placeholder="Enter your first name"
                   />
-                  <ErrorMessage
-                    name="email"
-                    component="div"
-                    className="text-red-500 text-sm"
+                  <FormField
+                    label="Last Name"
+                    name="lastName"
+                    placeholder="Enter your last name"
                   />
                 </div>
+                <FormField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                />
 
-                <div className="flex-col items-center p-5">
+                <div className="flex items-center space-x-2">
                   <Field
                     type="checkbox"
                     id="agreeTerms"
@@ -168,11 +103,13 @@ const RegisterUser: React.FC = () => {
                     I agree to all <span className="text-red-500">Terms</span>{" "}
                     and <span className="text-red-500">Privacy Policies</span>
                   </label>
-
-                  <div className="text-red-500 text-sm mt-2">
-                    <ErrorMessage name="agreeTerms" component="div" />
-                  </div>
+                  <ErrorMessage
+                    name="agreeTerms"
+                    component="div"
+                    className="text-red-500 text-sm"
+                  />
                 </div>
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -180,15 +117,6 @@ const RegisterUser: React.FC = () => {
                 >
                   {isSubmitting ? "Creating.." : "Create account"}
                 </button>
-                <p className="text-center p-3">
-                  Already have an account?{" "}
-                  <span className="text-red-500 cursor-pointer">Login</span>
-                </p>
-
-                <div className="flex items-center my-4 gap-4">
-                  <div className="flex-grow border-t border-gray-300"></div>
-                  <div className="flex-grow border-t border-gray-300"></div>
-                </div>
               </Form>
             )}
           </Formik>

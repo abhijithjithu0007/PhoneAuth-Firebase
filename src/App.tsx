@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Routes, Route } from "react-router-dom";
 import Auth from "./components/Auth";
 import VerifyOtp from "./components/VerifyOtp";
 import RegisterUser from "./components/RegisterUser";

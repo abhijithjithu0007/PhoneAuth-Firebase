@@ -33,9 +33,7 @@ const VerifyOtp = () => {
       if (!confirmationResult) {
         return;
       }
-
       setLoading(true);
-
       const result = await confirmationResult.confirm(values.otp);
 
       onAuthStateChanged(auth, async (user) => {
@@ -51,7 +49,7 @@ const VerifyOtp = () => {
           if (!querySnapshot.empty) {
             navigate("/profile");
           } else {
-            const userRef = doc(db, "users", result.user.uid);
+            doc(db, "users", result.user.uid);
             toast.success("Phone number registered successfully!");
             navigate("/register");
           }

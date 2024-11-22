@@ -52,12 +52,9 @@ const Auth = () => {
 
       dispatch(setConfirmationResult(confirmation));
       toast.success("OTP sent to your phone.");
-      localStorage.setItem("phoneNumber", "+91" + values.phoneNumber);
       navigate("/verify");
     } catch (error: any) {
-      toast.error(
-        `Error sending OTP: ${error.message || "Unknown error occurred"}`
-      );
+      toast.error("Error sending OTP");
     } finally {
       dispatch(setLoading(false));
     }

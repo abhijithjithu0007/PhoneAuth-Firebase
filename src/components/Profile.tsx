@@ -30,10 +30,8 @@ const Profile: React.FC = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      localStorage.removeItem("phoneNumber");
       navigate("/");
       toast.success("Logged out successfully.");
-      localStorage.removeItem("isLogin");
       dispatch(setAuthenticated(true));
     } catch (error: any) {
       console.log(error);
@@ -42,11 +40,6 @@ const Profile: React.FC = () => {
 
   return (
     <div className="relative flex items-center justify-center min-h-screen">
-      <img
-        src="/assets/logo.png"
-        alt="Logo"
-        className="absolute top-10 right-10 w-16 h-16"
-      />
       <div className="flex flex-col items-center">
         <h2 className="text-2xl font-bold mb-4 text-center">
           {phoneNumber ? phoneNumber : "Loading..."}

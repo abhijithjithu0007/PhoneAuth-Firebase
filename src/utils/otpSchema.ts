@@ -7,3 +7,16 @@ export const otpValidationSchema = (otp: string) =>
       .matches(/^\d+$/, "OTP must contain only digits")
       .required("OTP is required"),
   });
+
+export const validationSchema = (firstName, lastName, email, agreeTerms) =>
+  Yup.object({
+    firstName: Yup.string().required("First Name is required"),
+    lastName: Yup.string().required("Last Name is required"),
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
+    agreeTerms: Yup.bool().oneOf(
+      [true],
+      "You must agree to the terms and conditions."
+    ),
+  });
